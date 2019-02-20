@@ -22,6 +22,9 @@ public class Term implements Comparable<Term>{
     public int getNumberOfTerm(){
         return postingList.size();
     }
+    public int getNumberOfDocument(){
+        return postingList.size();
+    }
     /**
      * @return the term
      */
@@ -54,9 +57,9 @@ public class Term implements Comparable<Term>{
 
     @Override
     public int compareTo(Term o) {
-       return term.compareToIgnoreCase(o.getTerm());
-    }
+       return term.compareToIgnoreCase(o.getTerm());   }
 
+ 
     
     
 }
