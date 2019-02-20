@@ -17,6 +17,7 @@ import java.util.function.Consumer;
  *
  * @author admin
  */
+
 public class InvertedIndex {
     private ArrayList<Document> listOfDocument = new ArrayList<Document>();
     private ArrayList<Term> dictionary = new ArrayList<Term>();
@@ -53,6 +54,37 @@ public class InvertedIndex {
         // urutkan
         Collections.sort(list);
         return list;
+    }
+    /**
+     * Fungsi cari dokumen
+     * @param query
+     * @return 
+     */
+    public ArrayList<Posting> search(String query){
+        // buat index/dictionary
+        makeDictionary();
+        String tempQuery[] = query.split(" ");
+        for (int i = 0; i < tempQuery.length; i++) {
+            String string = tempQuery[i];
+            
+        }
+        return null;
+    }
+    
+    public ArrayList<Posting> searchOneWord(String word){
+        Term tempTerm = new Term(word);
+        if(getDictionary().isEmpty()){
+            // dictionary kosong
+            return null;
+        } else{
+            int positionTerm = Collections.binarySearch(dictionary,tempTerm);
+            if(positionTerm<0){
+                // tidak ditemukan
+                return null;
+            } else{
+                return dictionary.get(positionTerm).getPostingList();
+            }
+        }
     }
     
     public void makeDictionary(){
@@ -125,9 +157,7 @@ public class InvertedIndex {
         this.dictionary = dictionary;
     }
 
-    public ArrayList<Document> search(String query) {
-        return null;
-        
+    public ArrayList<Posting> intersection(ArrayList<Posting> result1, ArrayList<Posting> result) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
-
