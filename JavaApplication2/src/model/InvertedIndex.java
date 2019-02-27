@@ -21,14 +21,17 @@ import java.util.function.Consumer;
 public class InvertedIndex {
     private ArrayList<Document> listOfDocument = new ArrayList<Document>();
     private ArrayList<Term> dictionary = new ArrayList<Term>();
+
     public InvertedIndex() {
     }
-    
-    public void addNewDocument(Document document){
+
+    public void addNewDocument(Document document) {
         getListOfDocument().add(document);
     }
     
-    public ArrayList<Posting> getUnsortedPostingList(){
+
+    public ArrayList<Posting> getUnsortedPostingList() {
+        // cek untuk term yang muncul lebih dari 1 kali
         // siapkan posting List
         ArrayList<Posting> list = new ArrayList<Posting>();
         // buat node Posting utk listofdocument
@@ -40,13 +43,14 @@ public class InvertedIndex {
                 // buat object tempPosting
                 Posting tempPosting = new Posting(termResult[j],
                         getListOfDocument().get(i));
+                // cek kemunculan term
                 list.add(tempPosting);
             }
         }
         return list;
     }
-    
-    public ArrayList<Posting> getSortedPostingList(){
+
+    public ArrayList<Posting> getSortedPostingList() {
         // siapkan posting List
         ArrayList<Posting> list = new ArrayList<Posting>();
         // panggil list yang belum terurut
@@ -55,167 +59,101 @@ public class InvertedIndex {
         Collections.sort(list);
         return list;
     }
+
     /**
      * Fungsi cari dokumen
+     *
      * @param query
-     * @return 
+     * @return
      */
-    public ArrayList<Posting> search(String query){
+    public ArrayList<Posting> search(String query) {
         // buat index/dictionary
-        makeDictionary();
+//        makeDictionary();
         String tempQuery[] = query.split(" ");
+        ArrayList<Posting> result = new ArrayList<Posting>();
         for (int i = 0; i < tempQuery.length; i++) {
             String string = tempQuery[i];
-            
-        }
-        return null;
-    }
-    
-    public ArrayList<Posting> searchOneWord(String word){
-        Term tempTerm = new Term(word);
-        if(getDictionary().isEmpty()){
-            // dictionary kosong
-            return null;
-        } else{
-            int positionTerm = Collections.binarySearch(dictionary,tempTerm);
-            if(positionTerm<0){
-                // tidak ditemukan
-                return null;
-            } else{
-                return dictionary.get(positionTerm).getPostingList();
+            if (i == 0) {
+                result = searchOneWord(string);
+            } else {
+                ArrayList<Posting> result1 = searchOneWord(string);
+                result = intersection(result, result1);
             }
         }
-    }
-    
-    public void makeDictionary(){
-        // buat posting list term terurut
-        ArrayList<Posting> list = getSortedPostingList();
-        // looping buat list of term (dictionary)
-        for (int i = 0; i < list.size(); i++) {
-            // cek dictionary kosong?
-            if(getDictionary().isEmpty()){
-                // buat term
-                Term term = new Term(list.get(i).getTerm());
-                // tambah posting ke posting list utk term ini
-                term.getPostingList().add(list.get(i));
-                // tambah ke dictionary
-                getDictionary().add(term);
-            } else{
-                // dictionary sudah ada isinya
-                Term tempTerm = new Term(list.get(i).getTerm());
-                // pembandingan apakah term sudah ada atau belum
-                // luaran dari binarysearch adalah posisi
-                int position= Collections.binarySearch(getDictionary(), tempTerm);
-                if(position<0){
-                    // term baru
-                    // tambah postinglist ke term
-                    tempTerm.getPostingList().add(list.get(i));
-                    // tambahkan term ke dictionary
-                    getDictionary().add(tempTerm);
-                } else{
-                    // term ada
-                    // tambahkan postinglist saja dari existing term
-                    getDictionary().get(position).
-                            getPostingList().add(list.get(i));
-                    // urutkan posting list
-                    Collections.sort(getDictionary().get(position)
-                            .getPostingList());
-                }
-                // urutkan term dictionary
-                Collections.sort(getDictionary());
-            }
-            
-        }
-        
+        return result;
     }
 
     /**
-     * @return the listOfDocument
+     * Fungsi untuk menggabungkan 2 buah posting Made by Johan
+     *
+     * @param p1
+     * @param p2
+     * @return
      */
-    public ArrayList<Document> getListOfDocument() {
-        return listOfDocument;
-    }
-
-    /**
-     * @param listOfDocument the listOfDocument to set
-     */
-    public void setListOfDocument(ArrayList<Document> listOfDocument) {
-        this.listOfDocument = listOfDocument;
-    }
-
-    /**
-     * @return the dictionary
-     */
-    public ArrayList<Term> getDictionary() {
-        return dictionary;
-    }
-
-    /**
-     * @param dictionary the dictionary to set
-     */
-    public void setDictionary(ArrayList<Term> dictionary) {
-        this.dictionary = dictionary;
-    }
-
-  public ArrayList<Posting> intersection(ArrayList<Posting> p1, ArrayList<Posting> p2) {
-         if (p1 == null || p2 == null) {
-            // mengembalikan posting p1 atau p2
+    public ArrayList<Posting> intersection(ArrayList<Posting> p1,
+            ArrayList<Posting> p2) {
+        if (p1 == null || p2 == null) {
             return new ArrayList<>();
         }
-        // menyiapkan posting tempPosting
-        ArrayList<Posting> tempPostings = new ArrayList<>();
-        // menyiapkan variable p1Index dan p2Index
+
+        ArrayList<Posting> postings = new ArrayList<>();
         int p1Index = 0;
         int p2Index = 0;
 
-        // menyiapkan variable post1 dan post2 bertipe Posting 
         Posting post1 = p1.get(p1Index);
         Posting post2 = p2.get(p2Index);
 
         while (true) {
-            // mengecek id document post1 = id document post2?
             if (post1.getDocument().getId() == post2.getDocument().getId()) {
                 try {
-                    // menambahkan post1 ke tempPosting
-                    tempPostings.add(post1);
-                    // p1Index dan p2Index bertambah 1
+                    postings.add(post1);
                     p1Index++;
                     p2Index++;
-
                     post1 = p1.get(p1Index);
                     post2 = p2.get(p2Index);
-                } catch (Exception ex) {
-                    // menghentikan program
+                } catch (Exception e) {
                     break;
                 }
 
-            } // mengecek id document post1 < id document post2?
-            else if (post1.getDocument().getId() < post2.getDocument().getId()) {
+            } else if (post1.getDocument().getId() < post2.getDocument().getId()) {
                 try {
-                    // p1Index bertambah 1
                     p1Index++;
                     post1 = p1.get(p1Index);
-                } catch (Exception ex) {
-                    // menghentikan program
+                } catch (Exception e) {
                     break;
                 }
 
             } else {
                 try {
-                    // p2Index bertambah 1
                     p2Index++;
                     post2 = p2.get(p2Index);
-                } catch (Exception ex) {
-                    // menghentikan program
+                } catch (Exception e) {
                     break;
                 }
             }
         }
-        // mengembalikan tempPosting
-        return tempPostings;
+        return postings;
     }
 
-    public void MakeDictionary() {
+    public ArrayList<Posting> searchOneWord(String word) {
+        Term tempTerm = new Term(word);
+        if (getDictionary().isEmpty()) {
+            // dictionary kosong
+            return null;
+        } else {
+            int positionTerm = Collections.binarySearch(dictionary, tempTerm);
+            if (positionTerm < 0) {
+                // tidak ditemukan
+                return null;
+            } else {
+                return dictionary.get(positionTerm).getPostingList();
+            }
+        }
+    }
+
+    public void makeDictionary() {
+        // cek deteksi ada term yang frekuensinya lebih dari 
+        // 1 pada sebuah dokumen
         // buat posting list term terurut
         ArrayList<Posting> list = getSortedPostingList();
         // looping buat list of term (dictionary)
@@ -250,7 +188,56 @@ public class InvertedIndex {
                             .getPostingList());
                 }
                 // urutkan term dictionary
-                Collections.sort(getDictionary());  }
-}}
+                Collections.sort(getDictionary());
+            }
 
+        }
+
+    }
+
+    /**
+     * @return the listOfDocument
+     */
+    public ArrayList<Document> getListOfDocument() {
+        return listOfDocument;
+    }
+
+    /**
+     * @param listOfDocument the listOfDocument to set
+     */
+    public void setListOfDocument(ArrayList<Document> listOfDocument) {
+        this.listOfDocument = listOfDocument;
+    }
+
+    /**
+     * @return the dictionary
+     */
+    public ArrayList<Term> getDictionary() {
+        return dictionary;
+    }
+
+    /**
+     * @param dictionary the dictionary to set
+     */
+    public void setDictionary(ArrayList<Term> dictionary) {
+        this.dictionary = dictionary;
+    }
+    
+    /**
+     * Fungsi mencari frequensi sebuah term dalam sebuah index
+     * @param term
+     * @return 
+     */
+    public int getDocumentFrequency(String term){
+        return 0;
+    }
+    
+    /**
+     * Fungsi untuk mencari inverse term dari sebuah index
+     * @param term
+     * @return 
+     */
+    public double getInverseDocumentFrequency(String term){
+        return 0.0;
+    }
 }
