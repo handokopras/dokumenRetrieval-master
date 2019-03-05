@@ -10,11 +10,10 @@ package model;
  * @author admin
  */
 public class Posting implements Comparable<Posting>{
-   private String term;
+ private String term;
     private Document document;
     private int numberOfTerm = 1;
-    
-    
+
     public Posting(Document document) {
         this.document = document;
     }
@@ -23,8 +22,10 @@ public class Posting implements Comparable<Posting>{
         this.term = term;
         this.document = document;
     }
-    
 
+    Posting() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     /**
      * @return the document
      */
@@ -55,7 +56,19 @@ public class Posting implements Comparable<Posting>{
 
     @Override
     public int compareTo(Posting posting) {
-        return term.compareToIgnoreCase(posting.getTerm());
+        int result = 0;
+        result = term.compareToIgnoreCase(posting.getTerm());
+        if (result == 0) {
+            if(posting.getDocument()!=null){
+                result = getDocument().getId() - 
+                        posting.getDocument().getId();
+                return result;
+            } else{
+                return result;
+            }
+        } else {
+            return result;
+        }
     }
 
     /**
@@ -71,5 +84,5 @@ public class Posting implements Comparable<Posting>{
     public void setNumberOfTerm(int numberOfTerm) {
         this.numberOfTerm = numberOfTerm;
     }
-    
+
 }
