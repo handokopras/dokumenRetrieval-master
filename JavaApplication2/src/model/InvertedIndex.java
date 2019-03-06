@@ -369,20 +369,55 @@ public class InvertedIndex {
      * @param idDocument
      */
     public ArrayList<Posting> makeTFIDF(int idDocument) {
-        ArrayList<Term> terms = getDictionary();
-
-        ArrayList<Posting> result = new ArrayList<>();
-        for (int i = 0; i < terms.size(); i++) {
-            double weight = getTermFrequency(terms.get(i).getTerm(), idDocument) * getInverseDocumentFrequency(terms.get(i).getTerm());
-
-            Posting tempPosting = new Posting();
-            tempPosting.setTerm(terms.get(i).getTerm());
-            tempPosting.setWeight(weight);
-
-            result.add(tempPosting);
+        Document doc = new Document();
+        doc.setId(idDocument);
+        //cek dokumen ada 
+        int cek = Collections.binarySearch(listOfDocument, doc);
+        if (cek < 0 ) {
+                // dokument tidak ada
+           return null;
+        }else {
+            // dokument ada
+            doc = listOfDocument.get(cek);
+            //buat posting list tanpa TFIDF
+            ArrayList<Posting> result = doc.getListofPosting();
+            // isi atribut weigth dari masing masing posting
+            for (int i = 0; i < result.size(); i++) {
+                // buat temp posting
+                Posting temp = result.get(i);
+                // panggil fungsi hitung tf
+                double idf = getInverseDocumentFrequency(temp.getTerm());
+                int tf = temp.getNumberOfTerm();
+                double weigth = tf*idf;
+           
+            }
+            return result;
+        
+            
         }
-
-        return result;
+        
     }
-
+        
+    
+ /**
+     * Fungsi perkalian inner product dari PostingList
+     * Atribut yang dikalikan adalah atribut weight TFIDF dari posting
+     * @param p1
+     * @param p2
+     * @return 
+     */
+    public double getInnerProduct(ArrayList<Posting> p1,
+            ArrayList<Posting> p2){
+        return 0.0;
+    }
+    
+    /**
+     * Fungsi untuk membentuk posting list dari sebuah query
+     * @param query
+     * @return 
+     */
+    public ArrayList<Posting> getQueryPosting(String query){
+        return null;
+    }
 }
+
