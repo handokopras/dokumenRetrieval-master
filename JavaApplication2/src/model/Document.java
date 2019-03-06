@@ -6,6 +6,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.StringTokenizer;
 
@@ -14,6 +15,7 @@ import java.util.StringTokenizer;
  * @author puspaningtyas
  */
 public class Document implements Comparable<Document>{
+
     private int id;
     private String content;
 
@@ -109,7 +111,7 @@ public class Document implements Comparable<Document>{
 
     @Override
     public int compareTo(Document doc) {
-     return id-doc.getId();
+        return id-doc.getId();
     }
 
 }

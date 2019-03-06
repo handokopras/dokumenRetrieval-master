@@ -290,7 +290,6 @@ public class InvertedIndex {
         this.dictionary = dictionary;
     }
 
-    
     /**
      * Fungsi mencari frequensi sebuah term dalam sebuah index
      *
@@ -331,7 +330,7 @@ public class InvertedIndex {
             // jumlah dokumen dengan term i
             int ni = getDocumentFrequency(term);
             // idf = log10(N/ni)
-            return Math.log10(N/ni);
+            return Math.log10(N / ni);
         } else {
             // term tidak ada
             // nilai idf = 0
@@ -347,23 +346,43 @@ public class InvertedIndex {
      * @return
      */
     public int getTermFrequency(String term, int idDocument) {
-         Document tempDocument = new Document();
-     
-        tempDocument.setId(idDocument);
-        int index = Collections.binarySearch(getListOfDocument(),tempDocument);
-        if (index >= 0) {
-            ArrayList<Posting> tempPosting = getListOfDocument().get(index).getListofPosting();
+        Document document = new Document();
+        document.setId(idDocument);
+        int pos = Collections.binarySearch(listOfDocument, document);
+        if (pos >= 0) {
+            ArrayList<Posting> tempPosting = listOfDocument.get(pos).getListofPosting();
             Posting posting = new Posting();
             posting.setTerm(term);
-           
             int postingIndex = Collections.binarySearch(tempPosting, posting);
             if (postingIndex >= 0) {
                 return tempPosting.get(postingIndex).getNumberOfTerm();
             }
             return 0;
         }
-        
+
         return 0;
+    }
+
+    /**
+     * Fungsi untuk menghitung TF-IDF dari sebuah dokumen
+     *
+     * @param idDocument
+     */
+    public ArrayList<Posting> makeTFIDF(int idDocument) {
+        ArrayList<Term> terms = getDictionary();
+
+        ArrayList<Posting> result = new ArrayList<>();
+        for (int i = 0; i < terms.size(); i++) {
+            double weight = getTermFrequency(terms.get(i).getTerm(), idDocument) * getInverseDocumentFrequency(terms.get(i).getTerm());
+
+            Posting tempPosting = new Posting();
+            tempPosting.setTerm(terms.get(i).getTerm());
+            tempPosting.setWeight(weight);
+
+            result.add(tempPosting);
+        }
+
+        return result;
     }
 
 }
