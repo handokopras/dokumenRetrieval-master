@@ -407,18 +407,37 @@ public class InvertedIndex {
      * @param p2
      * @return 
      */
-    public double getInnerProduct(ArrayList<Posting> p1,
-            ArrayList<Posting> p2){
-        return 0.0;
+   public Double getInnerProduct(ArrayList<Posting> p1, ArrayList<Posting> p2) {
+        double result = 0;
+        for (int i = 0; i < p1.size(); i++) {
+            int Posting = Collections.binarySearch(p2, p1.get(i));
+            if (Posting >= 0) {
+                result = result + (p1.get(i).getWeight()* p2.get(Posting).getWeight());
+            }
+        }
+        return result;
     }
+
+    
     
     /**
      * Fungsi untuk membentuk posting list dari sebuah query
      * @param query
      * @return 
      */
-    public ArrayList<Posting> getQueryPosting(String query){
-        return null;
-    }
+   public ArrayList<Posting> getQueryPosting(String query) {
+        Document doc = new Document();
+        doc.setContent(query);
+
+        ArrayList<Posting> result = doc.getListofPosting();
+        for (int i = 0; i < result.size(); i++) {
+            // weight = tf * idf
+            double weight = result.get(i).getNumberOfTerm() * getInverseDocumentFrequency(result.get(i).getTerm());
+
+            result.get(i).setWeight(weight);
+        }
+
+        return result;
+}
 }
 
