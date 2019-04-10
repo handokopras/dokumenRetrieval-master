@@ -477,7 +477,16 @@ public class InvertedIndex {
      * @return 
      */
     public double getLengthOfPosting(ArrayList<Posting> posting){
-        return 0;
+         double result = 0;
+        for (int i = 0; i < posting.size(); i++) {
+             Posting post = posting.get(i);
+             double weight = post.getWeight();
+             weight = weight * weight;
+             result = result + weight;
+//            result += posting.get(i).getWeight() * posting.get(i).getWeight();
+        }
+
+        return Math.sqrt(result);
     }
     
     /**
