@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package test;
 
 import java.util.ArrayList;
@@ -13,7 +18,7 @@ import model.Term;
  */
 public class testTFIDF8 {
 
- public static void main(String[] args) {
+    public static void main(String[] args) {
         // seting dokumen
         Document doc1 = new Document(1, "Shipment of gold damaged in a fire");
         Document doc2 = new Document(2, "delivery of silver arrived in a silver truck");
